@@ -4,7 +4,7 @@ import { RouterLink, RouterView } from 'vue-router'
 import { fetchWeather } from "./service/apiService"
 
 const inputValue = ref(""); 
-const weatherData =ref({}); 
+const weatherData =ref<WeatherData | null>(null); 
 
 interface WeatherData {
   name: string; 
@@ -18,13 +18,12 @@ interface WeatherData {
 
 const handleButtonClick = async () => {
   try {
-    weatherData.value = await fetchWeather(inputValue.value)
-    console.log(weatherData.value);
-    
-    const{name, main, weather} = weatherData.value as WeatherData;
-    console.log("City: ", name);
-    console.log("Temprature: " , main.temp);
-    console.log("Description: ", weather[0].description);
+    const data = await fetchWeather(inputValue.value);
+    weatherData.value = {
+      name: data.name,
+      main: data.main, 
+      weather: data.weather
+    };
      
   } catch (error){
     console.error(error)
@@ -40,7 +39,12 @@ const handleButtonClick = async () => {
       <input class="city-input" placeholder="Search city..." v-model="inputValue" @keypress.enter="handleButtonClick">
       <button class="submit-button" type="submit" @click="handleButtonClick" >Search</button>
     </div>
-  
+    <div v-if="weatherData!=null" class="current-weather">
+      <p>City: {{ weatherData.name }}</p>
+      <p>Temprature: {{ weatherData.main.temp}}</p>
+      <p>Weather:</p>
+
+    </div>
     <RouterView />
   </div>
   
