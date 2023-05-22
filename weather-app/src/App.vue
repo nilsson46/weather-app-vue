@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { RouterLink, RouterView } from 'vue-router'
-import { fetchWeather } from "./service/apiService"
+import { fetchCurrentWeather, fetchWeatherForecast } from "./service/apiService"
 
 const inputValue = ref(""); 
 const weatherData =ref<WeatherData | null>(null); 
@@ -18,7 +18,7 @@ interface WeatherData {
 
 const handleButtonClick = async () => {
   try {
-    const data = await fetchWeather(inputValue.value);
+    const data = await fetchCurrentWeather(inputValue.value);
     weatherData.value = {
       name: data.name,
       main: data.main, 
@@ -29,6 +29,10 @@ const handleButtonClick = async () => {
     console.error(error)
   }
 };
+
+/*const handleWeatherDetail = () => {
+  console.log("Här kommer data")
+} */
 
 
 </script>
@@ -42,7 +46,8 @@ const handleButtonClick = async () => {
     <div v-if="weatherData!=null" class="current-weather">
       <p>City: {{ weatherData.name }}</p>
       <p>Temprature: {{ weatherData.main.temp}}</p>
-      <p>Weather:</p>
+      <p>Weather: {{ weatherData.weather[0].description }}</p>
+      <!--<button class="weather-deatils" @click="handleWeatherDetail">Deatails</button> -->
 
     </div>
     <RouterView />
