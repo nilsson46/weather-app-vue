@@ -1,25 +1,16 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { RouterLink, RouterView } from 'vue-router'
-import { fetchCurrentWeather, fetchWeatherForecast } from "./service/apiService"
+import { fetchCurrentWeather, fetchWeatherForecast, fetchGeoLocation, CurrentWeatherData } from "./service/apiService"
 
 const inputValue = ref(""); 
-const weatherData =ref<WeatherData | null>(null); 
-
-interface WeatherData {
-  name: string; 
-  main: {
-    temp: number; 
-  };
-  weather: {
-    description: string;
-  }[];
-}
+const currentWeather =ref<CurrentWeatherData | null>(null); 
 
 const handleButtonClick = async () => {
   try {
-    const data = await fetchCurrentWeather(inputValue.value);
-    weatherData.value = {
+    const getLocation = await fetchGeoLocation(inputValue.value);
+    const data = await fetchCurrentWeather(getLocation.lat, getLocation.lon);
+    currentWeather.value = {
       name: data.name,
       main: data.main, 
       weather: data.weather
@@ -30,9 +21,16 @@ const handleButtonClick = async () => {
   }
 };
 
-/*const handleWeatherDetail = () => {
+const handleWeatherDetail = async () => {
   console.log("Här kommer data")
-} */
+  try{
+    const getLocation = await fetchGeoLocation(inputValue.value);
+    const data = await fetchWeatherForecast(getLocation.lat, getLocation.lon);
+      console.log(data)
+  }catch(error){
+    console.error(error)
+  }
+} 
 
 
 </script>
@@ -43,11 +41,11 @@ const handleButtonClick = async () => {
       <input class="city-input" placeholder="Search city..." v-model="inputValue" @keypress.enter="handleButtonClick">
       <button class="submit-button" type="submit" @click="handleButtonClick" >Search</button>
     </div>
-    <div v-if="weatherData!=null" class="current-weather">
-      <p>City: {{ weatherData.name }}</p>
-      <p>Temprature: {{ weatherData.main.temp}}</p>
-      <p>Weather: {{ weatherData.weather[0].description }}</p>
-      <!--<button class="weather-deatils" @click="handleWeatherDetail">Deatails</button> -->
+    <div v-if="currentWeather!=null" class="current-weather">
+      <p>City: {{ currentWeather.name }}</p>
+      <p>Temprature: {{ currentWeather.main.temp}}</p>
+      <p>Weather: {{ currentWeather.weather[0].description }}</p>
+      <button class="weather-deatils" @click="handleWeatherDetail">Deatails</button>
 
     </div>
     <RouterView />

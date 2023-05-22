@@ -5,8 +5,14 @@ interface GeoLocation {
   lon: number;
 }
 
-interface CurrentWeatherData {
-
+export interface CurrentWeatherData {
+  name: string; 
+  main: {
+    temp: number; 
+  };
+  weather: {
+    description: string;
+  }[];
 }
 
 interface WeatherForecastData{
