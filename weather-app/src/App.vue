@@ -23,19 +23,7 @@ import WeatherDetails from "./components/WeatherDetails.vue";
     const currentWeather =ref<CurrentWeatherData | null>(null); 
     const weatherDetails = ref<WeatherDetailsData | null>(null); 
     
-    const handleSearch = async (searchValue: string) => {
-  try {
-    const getLocation = await fetchGeoLocation(searchValue);
-    const data = await fetchCurrentWeather(getLocation.lat, getLocation.lon);
-    currentWeather.value = {
-      name: data.name,
-      main: data.main,
-      weather: data.weather,
-    };
-  } catch (error) {
-    console.error(error);
-  }
-};
+
 
 const handleWeatherDetail = async () => {
   try {
@@ -51,7 +39,7 @@ const handleWeatherDetail = async () => {
   } catch (error) {
     console.error("Error in handleWeather Detail:",error);
   }
-};
+}; 
 
 const toggleDetails = () => {
   if(weatherDetails.value){
@@ -60,6 +48,23 @@ const toggleDetails = () => {
     handleWeatherDetail();
   }
 };
+
+const onCitySearched = async (cityData) => {
+  console.log("City data received in App.vue:", cityData);
+  try{
+    const data = await fetchCurrentWeather(cityData.lat, cityData.lon);
+    currentWeather.value={
+      name: data.name,
+      main: data.main, 
+      weather: data.weather
+    };
+  } catch(error){
+    console.error(error);
+  }
+};
+
+
+
 
  /* return { 
     handleSearch, 
@@ -75,9 +80,10 @@ const toggleDetails = () => {
 <template>
   <div id ="app">
     <nav-bar></nav-bar>
-    <search-bar :onSearch="handleSearch"> </search-bar>
+    <search-bar @city-searched="onCitySearched"> </search-bar>
     
     <div v-if="currentWeather!=null" class="current-weather">
+      <img v-bind:src="'http://openweathermap.org/img/w/' +  + '.png' "  />
       <p>City: {{ currentWeather.name }}</p>
       <p>Temprature: {{ currentWeather.main.temp}}</p>
       <p>Weather: {{ currentWeather.weather[0].description }}</p>
@@ -91,6 +97,8 @@ const toggleDetails = () => {
   :conditions="weatherDetails.weather[0].main"
   :windSpeed="weatherDetails.wind.speed"
 ></weather-details>
+
+    <forecast-weather></forecast-weather>
     <RouterView />
   </div>
   

@@ -60,7 +60,7 @@ export const fetchGeoLocation = async (city: string): Promise<GeoLocation> => {
 
 export const fetchCurrentWeather = async (lat: number, lon: number): Promise<CurrentWeatherData> => {
   try {
-    const response = await axios.get<CurrentWeatherData>(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=eae526c0c59da830ba1afac8ab0f3347`);
+    const response = await axios.get<CurrentWeatherData>(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=eae526c0c59da830ba1afac8ab0f3347&units=metric`);
     return response.data;
   } catch(error) {
     throw new Error("Failed to fetch current weather data")
@@ -69,18 +69,23 @@ export const fetchCurrentWeather = async (lat: number, lon: number): Promise<Cur
 
 export const fetchWeatherDetails = async (lat: number, lon: number): Promise<WeatherDetailsData> => {
   try {
-    const response = await axios.get<WeatherDetailsData>(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=eae526c0c59da830ba1afac8ab0f3347`);
+    const response = await axios.get<WeatherDetailsData>(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=eae526c0c59da830ba1afac8ab0f3347&units=metric`);
     return response.data;
   } catch(error) {
     throw new Error("Failed to fetch weather details data")
   }
 };
 
-export const fetchForecastDetails = async (lat: number, lon: number): Promise<ForecastWeatherData> => {
+export const fetchForecastWeather = async (lat: number, lon: number): Promise<ForecastWeatherData | undefined> => {
   try {
     const response = await axios.get<ForecastWeatherData>(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=eae526c0c59da830ba1afac8ab0f3347`);
-    return response.data;
-  } catch(error) {
+    const forecasts = response.data;
+    if (Array.isArray(forecasts) && forecasts.length > 0) {
+      return forecasts[0];
+    }
+  } catch (error) {
     throw new Error("Failed to fetch forecast weather data");
   }
+  
+  return undefined;
 };

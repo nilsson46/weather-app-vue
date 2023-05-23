@@ -9,9 +9,19 @@
 <script setup lang="ts">
 import { defineProps } from "vue";
 const props = defineProps({
-    temperature: Number,
-    conditions: String, 
-    windSpeed: Number,
-});
+    temperature: {
+        type: Number,
+        required: true, 
+    }, 
+
+    conditions:{
+        type: String,
+        required: true,
+    }, 
+    windSpeed:{ 
+        type: Number,
+        required: true 
+    },
+})
 </script>
 
