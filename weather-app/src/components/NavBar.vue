@@ -16,5 +16,7 @@ export default defineComponent({
 </script>
 
 <style>
-
+    nav{
+        background-color: aqua;
+    }
 </style>

@@ -31,9 +31,20 @@ export interface WeatherDetailsData{
   }[];
 } 
 
+export interface ForecastWeatherData {
+  name: string; 
+  main: {
+    temp: number; 
+  };
+  weather: {
+    description: string;
+  }[];
+}
+
+
 export const fetchGeoLocation = async (city: string): Promise<GeoLocation> => {
   try {
-    const response = await axios.get(`http://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=5&appid=eae526c0c59da830ba1afac8ab0f3347`);
+    const response = await axios.get(`https://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=5&appid=eae526c0c59da830ba1afac8ab0f3347`);
     const cities = response.data;
 
     if (Array.isArray(cities) && cities.length > 0) {
@@ -42,7 +53,8 @@ export const fetchGeoLocation = async (city: string): Promise<GeoLocation> => {
       throw new Error("No result found.");
     }
   } catch (error) {
-    throw new Error("Failed to fetch weather data.");
+    console.error("Failed to fetch geo location data:", error);
+    throw new Error("Failed to fetch geo location data.");
   }
 };
 
@@ -60,6 +72,15 @@ export const fetchWeatherDetails = async (lat: number, lon: number): Promise<Wea
     const response = await axios.get<WeatherDetailsData>(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=eae526c0c59da830ba1afac8ab0f3347`);
     return response.data;
   } catch(error) {
-    throw new Error("Failed to fetch forecast weather data")
+    throw new Error("Failed to fetch weather details data")
+  }
+};
+
+export const fetchForecastDetails = async (lat: number, lon: number): Promise<ForecastWeatherData> => {
+  try {
+    const response = await axios.get<ForecastWeatherData>(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=eae526c0c59da830ba1afac8ab0f3347`);
+    return response.data;
+  } catch(error) {
+    throw new Error("Failed to fetch forecast weather data");
   }
 };
