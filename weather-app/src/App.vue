@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { RouterLink, RouterView } from 'vue-router'
-import { fetchCurrentWeather, fetchWeatherForecast, fetchGeoLocation, CurrentWeatherData } from "./service/apiService"
+import { fetchCurrentWeather, fetchWeatherDetails, fetchGeoLocation, CurrentWeatherData, WeatherDetailsData } from "./service/apiService"
 
 const inputValue = ref(""); 
 const currentWeather =ref<CurrentWeatherData | null>(null); 
+const weatherDetails = ref<WeatherDetailsData | null>(null);
 
 const handleButtonClick = async () => {
   try {
@@ -22,11 +23,17 @@ const handleButtonClick = async () => {
 };
 
 const handleWeatherDetail = async () => {
-  console.log("Här kommer data")
   try{
     const getLocation = await fetchGeoLocation(inputValue.value);
-    const data = await fetchWeatherForecast(getLocation.lat, getLocation.lon);
-      console.log(data)
+    const data = await fetchWeatherDetails(getLocation.lat, getLocation.lon);
+
+    weatherDetails.value ={
+      name: data.name,
+      main: data.main,
+      wind: data.wind,
+      weather: data.weather
+    };
+
   }catch(error){
     console.error(error)
   }
@@ -47,6 +54,15 @@ const handleWeatherDetail = async () => {
       <p>Weather: {{ currentWeather.weather[0].description }}</p>
       <button class="weather-deatils" @click="handleWeatherDetail">Deatails</button>
 
+    </div>
+
+    <div v-if="weatherDetails != null" class="weather-details">
+      <p>City: {{weatherDetails.name}}</p>
+      <p>Temperatur: {{weatherDetails.main.temp}}</p>
+      <p>Feels like: {{weatherDetails.main.feels_like}}</p>
+      <p>Pressure: {{weatherDetails.main.pressure}}</p>
+      <p>Wind speed: {{weatherDetails.wind.speed}}</p>
+      <p>Weahter: {{weatherDetails.weather[0].main}}</p>
     </div>
     <RouterView />
   </div>

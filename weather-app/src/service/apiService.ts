@@ -15,9 +15,21 @@ export interface CurrentWeatherData {
   }[];
 }
 
-interface WeatherForecastData{
-
-}
+export interface WeatherDetailsData{
+  name: string; 
+  main: {
+    temp: number; 
+    feels_like: number;
+    pressure: number; 
+  };
+  wind: {
+    speed: number;
+  };
+  weather: {
+    main: string; 
+    description: string;
+  }[];
+} 
 
 export const fetchGeoLocation = async (city: string): Promise<GeoLocation> => {
   try {
@@ -43,9 +55,9 @@ export const fetchCurrentWeather = async (lat: number, lon: number): Promise<Cur
   }
 }; 
 
-export const fetchWeatherForecast = async (lat: number, lon: number): Promise<WeatherForecastData> => {
+export const fetchWeatherDetails = async (lat: number, lon: number): Promise<WeatherDetailsData> => {
   try {
-    const response = await axios.get<WeatherForecastData>(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=eae526c0c59da830ba1afac8ab0f3347`);
+    const response = await axios.get<WeatherDetailsData>(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=eae526c0c59da830ba1afac8ab0f3347`);
     return response.data;
   } catch(error) {
     throw new Error("Failed to fetch forecast weather data")
