@@ -104,7 +104,7 @@ loadRecentSearches();
     <div v-if="currentWeather!==null" class="current-weather">
       <img :src="'http://openweathermap.org/img/wn/' + currentWeather.weather[0].icon + '.png'" />
       <p>Stad: {{ currentWeather.name }}</p>
-      <p>Tempratur: {{ currentWeather.main.temp}}</p>
+      <p>Tempratur: {{ currentWeather.main.temp}} °C</p>
       <p>Väderförhållanden: {{ currentWeather.weather[0].description }}</p>
       <button class="weather-details" @click="toggleDetails">Deatails</button>
 
@@ -116,8 +116,10 @@ loadRecentSearches();
     :conditions="weatherDetails.weather[0].description"
     :wind-speed="weatherDetails.wind.speed"
     ></WeatherDetails>
-    <ForecastWeather v-if="forecastData !== null" :forecastData="forecastData"></ForecastWeather>
-
+    <div>
+      <ForecastWeather v-if="forecastData !== null" :forecastData="forecastData">
+      </ForecastWeather>
+    </div>
     <RouterView />
   </div>
   

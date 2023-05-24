@@ -78,7 +78,7 @@ export const fetchWeatherDetails = async (lat: number, lon: number): Promise<Wea
 
 export const fetchForecastData = async (lat: number, lon: number): Promise<ForecastWeatherData[]> => {
   try {
-    const response = await axios.get<ForecastWeatherData[]>(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=eae526c0c59da830ba1afac8ab0f3347`);
+    const response = await axios.get<ForecastWeatherData[]>(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=eae526c0c59da830ba1afac8ab0f3347&units=metric`);
     return response.data.list; // Modify here to access the list of forecast data
   } catch (error) {
     throw new Error("Failed to fetch forecast weather data");
