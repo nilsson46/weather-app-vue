@@ -6,7 +6,9 @@ import {
   fetchWeatherDetails, 
   fetchGeoLocation, 
   CurrentWeatherData, 
-  WeatherDetailsData } from "./service/apiService";
+  WeatherDetailsData, 
+  fetchForecastWeather,
+  ForecastWeatherData} from "./service/apiService";
 import { defineComponent } from "vue";
 import NavBar from "./components/NavBar.vue";
 import SearchBar from "./components/SearchBar.vue";
@@ -22,6 +24,7 @@ import WeatherDetails from "./components/WeatherDetails.vue";
     const inputValue = ref(""); 
     const currentWeather =ref<CurrentWeatherData | null>(null); 
     const weatherDetails = ref<WeatherDetailsData | null>(null); 
+    const forecastData = ref<ForecastWeatherData | null>(null);
     
 
 
@@ -30,12 +33,7 @@ const handleWeatherDetail = async () => {
     const getLocation = await fetchGeoLocation(currentWeather.value?.name || "");
     const data = await fetchWeatherDetails(getLocation.lat, getLocation.lon);
 
-    weatherDetails.value = {
-      name: data.name,
-      main: data.main,
-      wind: data.wind,
-      weather: data.weather,
-    };
+   
   } catch (error) {
     console.error("Error in handleWeather Detail:",error);
   }
@@ -58,6 +56,16 @@ const onCitySearched = async (cityData) => {
       main: data.main, 
       weather: data.weather
     };
+
+    const WeatherDetailsData = await fetchWeatherDetails(cityData.lat, cityData.lon);
+    weatherDetails.value = {
+      name: WeatherDetailsData.name,
+      main: WeatherDetailsData.main,
+      wind: WeatherDetailsData.wind,
+      weather: WeatherDetailsData.weather,
+    };
+
+    forecastData.value = await fetchForecastWeather (cityData.lat, cityData.lon);
   } catch(error){
     console.error(error);
   }
@@ -89,14 +97,16 @@ const onCitySearched = async (cityData) => {
       <p>Väderförhållanden: {{ currentWeather.weather[0].description }}</p>
       <button class="weather-details" @click="toggleDetails">Deatails</button>
 
-    </div>
+    </div>  
 
-    <weather-details
+    <WeatherDetails v-if="weather-details"></WeatherDetails>
+
+   <!--<weather-details
   v-if="weatherDetails !== null"
   :temperature="weatherDetails.main.temp"
   :conditions="weatherDetails.weather[0].main"
   :windSpeed="weatherDetails.wind.speed"
-></weather-details>
+></weather-details> -->
 
     <forecast-weather></forecast-weather>
     <RouterView />
