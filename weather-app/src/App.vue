@@ -1,26 +1,27 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch, onMounted } from "vue";
 import { RouterLink, RouterView } from 'vue-router';
-import { 
-  fetchCurrentWeather, 
-  fetchWeatherDetails, 
-  fetchGeoLocation, 
-  CurrentWeatherData, 
-  WeatherDetailsData, 
-  fetchForecastWeather,
-  ForecastWeatherData} from "./service/apiService";
+import {
+  fetchCurrentWeather,
+  fetchWeatherDetails,
+  fetchGeoLocation,
+  CurrentWeatherData,
+  WeatherDetailsData,
+  fetchForecastData,
+  ForecastWeatherData
+} from "./service/apiService";
 import NavBar from "./components/NavBar.vue";
 import SearchBar from "./components/SearchBar.vue";
 import WeatherDetails from "./components/WeatherDetails.vue";
 import ForecastWeather from "./components/ForecastWeather.vue";
-
+import OldSearches from "./components/OldSearches.vue";
     const inputValue = ref(""); 
     const currentWeather =ref<CurrentWeatherData | null>(null); 
     const weatherDetails = ref<WeatherDetailsData | null>(null); 
     const forecastData = ref<ForecastWeatherData | null>(null);
+    const recentSearches = ref<string[]>([])
+
     
-
-
 const handleWeatherDetail = async () => {
   try {
     const getLocation = await fetchGeoLocation(currentWeather.value?.name || "");
@@ -54,6 +55,12 @@ const onCitySearched = async (cityName) => {
       return;
     }
 
+    recentSearches.value.unshift(cityName);
+
+    if(recentSearches.value.length >3) {
+      recentSearches.value.pop();
+    }
+
     const currentWeatherData = await fetchCurrentWeather(location.lat, location.lon);
     currentWeather.value = {
       name: currentWeatherData.name,
@@ -69,22 +76,33 @@ const onCitySearched = async (cityName) => {
       weather: weatherDetailsData.weather,
     };
 
-    forecastData.value = await fetchForecastWeather(location.lat, location.lon);
-    }
-     catch (error) {
+    const forecastWeatherData = await fetchForecastData(location.lat, location.lon);
+    forecastData.value = forecastWeatherData;
+    console.log(forecastData.value);
+  } catch (error) {
     console.error(error);
   }
 };
+
+const loadRecentSearches = () => {
+  const searches = localStorage.getItem("recentSearches");
+  if(searches){
+    recentSearches.value = JSON.parse(searches);
+  }
+};
+
+loadRecentSearches();
     
 </script>
 
 <template>
   <div id ="app">
     <nav-bar></nav-bar>
+    <OldSearches></OldSearches>
     <search-bar @city-searched="onCitySearched"> </search-bar>
     
     <div v-if="currentWeather!==null" class="current-weather">
-      <img :src="'http://openweathermap.org/img/w/' + currentWeather.weather[0].icon + '.png'" />
+      <img :src="'http://openweathermap.org/img/wn/' + currentWeather.weather[0].icon + '.png'" />
       <p>Stad: {{ currentWeather.name }}</p>
       <p>Tempratur: {{ currentWeather.main.temp}}</p>
       <p>Väderförhållanden: {{ currentWeather.weather[0].description }}</p>
@@ -98,8 +116,8 @@ const onCitySearched = async (cityName) => {
     :conditions="weatherDetails.weather[0].description"
     :wind-speed="weatherDetails.wind.speed"
     ></WeatherDetails>
+    <ForecastWeather v-if="forecastData !== null" :forecastData="forecastData"></ForecastWeather>
 
-  <ForecastWeather :cityName="currentWeather?.name" :forecastData="forecastData" />
     <RouterView />
   </div>
   

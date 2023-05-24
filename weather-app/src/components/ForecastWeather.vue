@@ -1,41 +1,28 @@
 <template>
-    <div>
-      <h1>Forecast Weather</h1>
-      <div class="forecast-weather" v-for="weather in forecastData">
-        <div>Temperature: {{ weather.main.temp }}</div>
-        <div>Weather Conditions: {{ weather.weather[0].description }}</div>
-      </div>
+  <div class="forecast-weather">
+    <div
+      v-for="(forecast, index) in forecastData"
+      :key="index"
+      class="forecast-item"
+    >
+      <p>{{ forecast.weather[0].description }}</p>
+      <p>{{ forecast.main.temp }} °C</p>
     </div>
-  </template>
+  </div>
+</template>
 
 <script setup lang="ts">
+import { defineProps } from "vue";
 
-
-import { fetchForecastWeather, fetchGeoLocation } from "../service/apiService";
-import { ForecastWeatherData } from "../service/apiService";
-import { ref, onMounted, watch, defineProps } from "vue";
+export interface ForecastData {
+  weather: { description: string }[];
+  main: { temp: number };
+}
 
 const props = defineProps({
-  cityName: String,
-  forecastData: Array,
+  forecastData: {
+    type: Array as () => ForecastData[],
+    required: true,
+  },
 });
-const forecastData = ref<ForecastWeatherData[]>(props.forecastData);
-const city = ref("")
-
-onMounted(async () => {
-    await getForecastWeather();
-})
-
-const getForecastWeather = async () => {
-  try {
-    const location = await fetchGeoLocation(props.cityName);
-    forecastData.values = await fetchForecastWeather(location.lat, location.lon);
-  } catch (error) {
-    console.error("Failed to fetch forecast weather data", error);
-  }
-};
 </script>
-
-<style>
-
-</style>
