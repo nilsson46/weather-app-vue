@@ -84,9 +84,9 @@ const onCitySearched = async (cityData) => {
     
     <div v-if="currentWeather!=null" class="current-weather">
       <img v-bind:src="'http://openweathermap.org/img/w/' +  + '.png' "  />
-      <p>City: {{ currentWeather.name }}</p>
-      <p>Temprature: {{ currentWeather.main.temp}}</p>
-      <p>Weather: {{ currentWeather.weather[0].description }}</p>
+      <p>Stad: {{ currentWeather.name }}</p>
+      <p>Tempratur: {{ currentWeather.main.temp}}</p>
+      <p>Väderförhållanden: {{ currentWeather.weather[0].description }}</p>
       <button class="weather-details" @click="toggleDetails">Deatails</button>
 
     </div>

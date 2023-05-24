@@ -1,5 +1,12 @@
 <template>
-    <div>Hej</div>
+    <div>
+        <h1>Hej</h1>
+        <div class="forecast-weather" v-for="weather in forecastData" :key="weather.dt">
+                <div>Temperatur: {{ weather.main.temp }}</div>
+            <div>Väderförhållanden: {{ weather.weather[0].description}}</div>
+        </div>
+    </div>  
+
 </template>
 
 <script setup lang="ts">
