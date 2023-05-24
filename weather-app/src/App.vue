@@ -20,7 +20,7 @@ import OldSearches from "./components/OldSearches.vue";
     const weatherDetails = ref<WeatherDetailsData | null>(null); 
     const forecastData = ref<ForecastWeatherData | null>(null);
     const recentSearches = ref<string[]>([])
-
+    const showWeatherDetails = ref(false);
     
 const handleWeatherDetail = async () => {
   try {
@@ -39,9 +39,8 @@ const handleWeatherDetail = async () => {
 }; 
 
 const toggleDetails = () => {
-  if(weatherDetails.value){
-    weatherDetails.value = null;
-  } else {
+  showWeatherDetails.value = !showWeatherDetails.value;
+  if (showWeatherDetails.value && !weatherDetails.value){
     handleWeatherDetail();
   }
 };
@@ -111,7 +110,7 @@ loadRecentSearches();
     </div>  
 
     <WeatherDetails 
-    v-if="weatherDetails"
+    v-if="weatherDetails && showWeatherDetails"
     :temperature="weatherDetails.main.temp"
     :conditions="weatherDetails.weather[0].description"
     :wind-speed="weatherDetails.wind.speed"
