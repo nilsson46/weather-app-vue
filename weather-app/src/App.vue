@@ -9,18 +9,11 @@ import {
   WeatherDetailsData, 
   fetchForecastWeather,
   ForecastWeatherData} from "./service/apiService";
-import { defineComponent } from "vue";
 import NavBar from "./components/NavBar.vue";
 import SearchBar from "./components/SearchBar.vue";
 import WeatherDetails from "./components/WeatherDetails.vue";
-/*defineComponent({
-  name: "App",
-  components:{
-    NavBar,
-    SearchBar,
-    WeatherDetails,
-  }, 
-  setup(){ */
+import ForecastWeather from "./components/ForecastWeather.vue";
+
     const inputValue = ref(""); 
     const currentWeather =ref<CurrentWeatherData | null>(null); 
     const weatherDetails = ref<WeatherDetailsData | null>(null); 
@@ -32,7 +25,12 @@ const handleWeatherDetail = async () => {
   try {
     const getLocation = await fetchGeoLocation(currentWeather.value?.name || "");
     const data = await fetchWeatherDetails(getLocation.lat, getLocation.lon);
-
+    weatherDetails.value ={
+      name: data.name, 
+      main: data.main, 
+      wind: data.wind,
+      weather: data.weather,
+    }
    
   } catch (error) {
     console.error("Error in handleWeather Detail:",error);
@@ -47,42 +45,37 @@ const toggleDetails = () => {
   }
 };
 
-const onCitySearched = async (cityData) => {
-  console.log("City data received in App.vue:", cityData);
-  try{
-    const data = await fetchCurrentWeather(cityData.lat, cityData.lon);
-    currentWeather.value={
-      name: data.name,
-      main: data.main, 
-      weather: data.weather
+const onCitySearched = async (cityName) => {
+  console.log("City name received in App.vue:", cityName);
+  try {
+    const location = await fetchGeoLocation(cityName);
+    if (!location) {
+      // Handle no location found
+      return;
+    }
+
+    const currentWeatherData = await fetchCurrentWeather(location.lat, location.lon);
+    currentWeather.value = {
+      name: currentWeatherData.name,
+      main: currentWeatherData.main,
+      weather: currentWeatherData.weather
     };
 
-    const WeatherDetailsData = await fetchWeatherDetails(cityData.lat, cityData.lon);
+    const weatherDetailsData = await fetchWeatherDetails(location.lat, location.lon);
     weatherDetails.value = {
-      name: WeatherDetailsData.name,
-      main: WeatherDetailsData.main,
-      wind: WeatherDetailsData.wind,
-      weather: WeatherDetailsData.weather,
+      name: weatherDetailsData.name,
+      main: weatherDetailsData.main,
+      wind: weatherDetailsData.wind,
+      weather: weatherDetailsData.weather,
     };
 
-    forecastData.value = await fetchForecastWeather (cityData.lat, cityData.lon);
-  } catch(error){
+    forecastData.value = await fetchForecastWeather(location.lat, location.lon);
+    }
+     catch (error) {
     console.error(error);
   }
 };
-
-
-
-
- /* return { 
-    handleSearch, 
-    currentWeather, 
-    weatherDetails, 
-    toggleDetails, 
-    inputValue,
-    }; */
     
-
 </script>
 
 <template>
@@ -90,8 +83,8 @@ const onCitySearched = async (cityData) => {
     <nav-bar></nav-bar>
     <search-bar @city-searched="onCitySearched"> </search-bar>
     
-    <div v-if="currentWeather!=null" class="current-weather">
-      <img v-bind:src="'http://openweathermap.org/img/w/' +  + '.png' "  />
+    <div v-if="currentWeather!==null" class="current-weather">
+      <img :src="'http://openweathermap.org/img/w/' + currentWeather.weather[0].icon + '.png'" />
       <p>Stad: {{ currentWeather.name }}</p>
       <p>Tempratur: {{ currentWeather.main.temp}}</p>
       <p>Väderförhållanden: {{ currentWeather.weather[0].description }}</p>
@@ -99,16 +92,14 @@ const onCitySearched = async (cityData) => {
 
     </div>  
 
-    <WeatherDetails v-if="weather-details"></WeatherDetails>
+    <WeatherDetails 
+    v-if="weatherDetails"
+    :temperature="weatherDetails.main.temp"
+    :conditions="weatherDetails.weather[0].description"
+    :wind-speed="weatherDetails.wind.speed"
+    ></WeatherDetails>
 
-   <!--<weather-details
-  v-if="weatherDetails !== null"
-  :temperature="weatherDetails.main.temp"
-  :conditions="weatherDetails.weather[0].main"
-  :windSpeed="weatherDetails.wind.speed"
-></weather-details> -->
-
-    <forecast-weather></forecast-weather>
+  <ForecastWeather :cityName="currentWeather?.name" :forecastData="forecastData" />
     <RouterView />
   </div>
   
