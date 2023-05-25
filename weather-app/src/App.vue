@@ -5,26 +5,28 @@ import {
   fetchCurrentWeather,
   fetchWeatherDetails,
   fetchGeoLocation,
-  CurrentWeatherData,
-  WeatherDetailsData,
+  
   fetchForecastData,
-  ForecastWeatherData
+  
+} from "./service/apiService";
+import type {
+  ForecastWeatherData,
+  CurrentWeatherData,
+  WeatherDetailsData
 } from "./service/apiService";
 import NavBar from "./components/NavBar.vue";
 import SearchBar from "./components/SearchBar.vue";
 import WeatherDetails from "./components/WeatherDetails.vue";
-import ForecastWeather from "./components/ForecastWeather.vue";
-import OldSearches from "./components/OldSearches.vue";
-    const inputValue = ref(""); 
+import ForecastWeather from "./components/ForecastWeather.vue"; 
     const currentWeather =ref<CurrentWeatherData | null>(null); 
     const weatherDetails = ref<WeatherDetailsData | null>(null); 
     const forecastData = ref<ForecastWeatherData | null>(null);
-    const recentSearches = ref<string[]>([])
     const showWeatherDetails = ref(false);
     const noLocationFound = ref("");
     const latestSearches = ref<string[]>([]);
     const maxLatesetSearches = 3;
     const standardCities = ["Göteborg", "Stockholm", "Lund"]
+    const inputValue = ref("")
     
     
 const handleWeatherDetail = async () => {
@@ -51,7 +53,7 @@ const toggleDetails = () => {
   }
 };
 
-const onCitySearched = async (cityName) => {
+const onCitySearched = async (cityName : string) => {
   console.log("City name received in App.vue:", cityName);
   try { 
     noLocationFound.value="";
@@ -67,11 +69,6 @@ const onCitySearched = async (cityName) => {
       main: currentWeatherData.main,
       weather: currentWeatherData.weather
     };
-    
-    //local storage  
-    localStorage.setItem("firstSearch", currentWeather.value?.name)
-    firstSearch1.value = currentWeather.value?.name;
-
     latestSearches.value.unshift(currentWeather.value?.name || "");
     latestSearches.value = latestSearches.value.slice(0, maxLatesetSearches);
     
@@ -83,12 +80,17 @@ const onCitySearched = async (cityName) => {
     console.error(error);
   }
 };
-const firstSearch1 = computed(() => latestSearches.value[0]);
+const firstSearch = computed(() => latestSearches.value[0]);
 const secondSearch = computed(() => latestSearches.value[1]);
 const thirdSearch = computed(() => latestSearches.value[2]);
 
 if (latestSearches.value.length === 0) {
   latestSearches.value.push(...standardCities)
+}
+
+const updateInputValue = (value: string) => {
+  inputValue.value = value;
+  onCitySearched(value);
 }
     
 </script>
@@ -96,10 +98,10 @@ if (latestSearches.value.length === 0) {
 <template>
   <div id ="app">
     <nav-bar></nav-bar>
-    <button> {{ firstSearch1 }}</button>
-    <button> {{ secondSearch }}</button>
-    <button> {{ thirdSearch }}</button>
-    <search-bar @city-searched="onCitySearched"> </search-bar>
+    <button @click="updateInputValue(firstSearch)"> {{ firstSearch }}</button>
+    <button @click="updateInputValue(secondSearch)"> {{ secondSearch }}</button>
+    <button @click="updateInputValue(thirdSearch)"> {{ thirdSearch }}</button>
+    <search-bar :initialValue="inputValue" @city-searched="onCitySearched"> </search-bar>
     <div v-if="noLocationFound" class="no-location-found">{{ noLocationFound }}</div>
     <div v-if="currentWeather!==null" class="current-weather">
       <img :src="'http://openweathermap.org/img/wn/' + currentWeather.weather[0].icon + '.png'" />

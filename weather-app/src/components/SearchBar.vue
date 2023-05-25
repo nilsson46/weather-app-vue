@@ -5,35 +5,26 @@
         placeholder="Search city..."
         v-model="inputValue"
         @keypress.enter="handleSearch"
-        @blur="handleSearch"
+        @blur="handleBlur"
         @keyup="startSearchTimer"
       />
-      <button
-        class="submit-button"
-        type="submit"
-        @click="handleSearch"
-      >
-        Search
-      </button>
     </div>
   </template>
 
 <script setup lang="ts">
-import { ref, defineEmits } from "vue";
+import { ref, defineEmits, defineProps, onMounted, watch } from "vue"; 
 
 
+const props = defineProps({
+  initialValue:{
+    type: String, 
+    default:"",
+  },
+});
+
+const inputValue = ref(props.initialValue);
 const emit = defineEmits(["city-searched"]);
-
-const inputValue = ref("");
-const data = ref("")
 let searchTimer: ReturnType<typeof setTimeout> | null = null;
-
-
-/*const handleButtonClick = () => {
-  if (props.onSearch) {
-    props.onSearch(inputValue.value);
-  }
-}; */
 
 const handleSearch = () => {
   const searchValue = inputValue.value.trim();
@@ -42,6 +33,7 @@ const handleSearch = () => {
     return;
   }
   emit("city-searched", searchValue);
+  inputValue.value="";
 };
 
 const startSearchTimer = () => {
@@ -55,5 +47,21 @@ const clearSearchTimer = () => {
     searchTimer = null;
   }
 };
+
+const handleBlur= () => {
+  clearSearchTimer();
+  handleSearch();
+};
+
+watch(() => props.initialValue, (newValue) => {
+  inputValue.value = newValue;
+})
+
+onMounted(() => {
+  const storedValue = localStorage.getItem("searchValue");
+  if(storedValue) {
+    inputValue.value = storedValue;
+  }
+})
 
 </script>
