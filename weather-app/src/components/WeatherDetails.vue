@@ -1,8 +1,8 @@
 <template>
     <div class="weather-details">
-        <div>Temperatur: {{ props.temperature }} °C</div>
-        <div>Väderförhållanden: {{ props.conditions }}</div>
+        <div>Känns som: {{ props.feels_like }} °C</div>
         <div>Vindhastighet: {{ props.windSpeed}} m/s</div>
+        <div>Tryck: {{ props.pressure }} hPa</div>
 
     </div>
 </template>
@@ -11,24 +11,26 @@
 import { defineProps } from "vue";
 
 export interface WeatherDetails{
-    weather: {desription: string } [];
-    main: { temp: number }
+    main: { temp: number;
+            feels_like: number;
+            pressure: number; 
+            humidity: number; }
     
 }
-const props = defineProps({
-    temperature: {
-        type: Number,
-        required: true, 
-    }, 
-
-    conditions:{
-        type: String,
-        required: true,
-    }, 
+const props = defineProps({  
     windSpeed:{ 
         type: Number,
         required: true 
     },
+    feels_like:{
+        type: Number, 
+        required: true,
+    },
+    pressure:{
+        type: Number, 
+        required: true,
+    },
+
 })
 </script>
 

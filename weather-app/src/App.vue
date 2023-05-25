@@ -10,17 +10,17 @@ import {
   
 } from "./service/apiService";
 import type {
-  ForecastWeatherData,
   CurrentWeatherData,
   WeatherDetailsData
 } from "./service/apiService";
+import type {ForecastDataInterface} from "./modules/types"
 import NavBar from "./components/NavBar.vue";
 import SearchBar from "./components/SearchBar.vue";
 import WeatherDetails from "./components/WeatherDetails.vue";
 import ForecastWeather from "./components/ForecastWeather.vue"; 
     const currentWeather =ref<CurrentWeatherData | null>(null); 
     const weatherDetails = ref<WeatherDetailsData | null>(null); 
-    const forecastData = ref<ForecastWeatherData | null>(null);
+    const forecastData = ref<ForecastDataInterface[] | null> (null);
     const showWeatherDetails = ref(false);
     const noLocationFound = ref("");
     const latestSearches = ref<string[]>([]);
@@ -114,9 +114,9 @@ const updateInputValue = (value: string) => {
 
     <WeatherDetails 
     v-if="weatherDetails && showWeatherDetails"
-    :temperature="weatherDetails.main.temp"
-    :conditions="weatherDetails.weather[0].description"
     :wind-speed="weatherDetails.wind.speed"
+    :feels_like="weatherDetails.main.feels_like"
+    :pressure=" weatherDetails.main.pressure"
     ></WeatherDetails>
     <div>
       <ForecastWeather v-if="forecastData !== null" :forecastData="forecastData">
