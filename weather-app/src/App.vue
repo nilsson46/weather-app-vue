@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, onMounted } from "vue";
+import { ref, watch, onMounted, computed} from "vue";
 import { RouterLink, RouterView } from 'vue-router';
 import {
   fetchCurrentWeather,
@@ -22,7 +22,8 @@ import OldSearches from "./components/OldSearches.vue";
     const recentSearches = ref<string[]>([])
     const showWeatherDetails = ref(false);
     const noLocationFound = ref("");
-    const  = ref(localStorage.getItem("firstSearch"));
+    const latestSearches = ref<string[]>([]);
+    const maxLatesetSearches = 3;
 
     
     
@@ -71,6 +72,8 @@ const onCitySearched = async (cityName) => {
     localStorage.setItem("firstSearch", currentWeather.value?.name)
     firstSearch1.value = currentWeather.value?.name;
 
+    latestSearches.value.unshift(currentWeather.value?.name || "");
+    latestSearches.value = latestSearches.value.slice(0, maxLatesetSearches);
     
 
 
@@ -80,6 +83,9 @@ const onCitySearched = async (cityName) => {
     console.error(error);
   }
 };
+const firstSearch1 = computed(() => latestSearches.value[0]);
+const secondSearch = computed(() => latestSearches.value[1]);
+const thirdSearch = computed(() => latestSearches.value[2]);
     
 </script>
 
@@ -87,6 +93,8 @@ const onCitySearched = async (cityName) => {
   <div id ="app">
     <nav-bar></nav-bar>
     <button> {{ firstSearch1 }}</button>
+    <button> {{ secondSearch }}</button>
+    <button> {{ thirdSearch }}</button>
     <search-bar @city-searched="onCitySearched"> </search-bar>
     <div v-if="noLocationFound" class="no-location-found">{{ noLocationFound }}</div>
     <div v-if="currentWeather!==null" class="current-weather">
