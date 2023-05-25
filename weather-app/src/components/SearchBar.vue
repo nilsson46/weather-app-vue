@@ -5,6 +5,8 @@
         placeholder="Search city..."
         v-model="inputValue"
         @keypress.enter="handleSearch"
+        @blur="handleSearch"
+        @keyup="startSearchTimer"
       />
       <button
         class="submit-button"
@@ -24,6 +26,7 @@ const emit = defineEmits(["city-searched"]);
 
 const inputValue = ref("");
 const data = ref("")
+let searchTimer: ReturnType<typeof setTimeout> | null = null;
 
 
 /*const handleButtonClick = () => {
@@ -40,4 +43,17 @@ const handleSearch = () => {
   }
   emit("city-searched", searchValue);
 };
+
+const startSearchTimer = () => {
+  clearSearchTimer(); 
+  searchTimer = setTimeout(handleSearch, 2000);
+};
+
+const clearSearchTimer = () => {
+  if(searchTimer) {
+    clearTimeout(searchTimer);
+    searchTimer = null;
+  }
+};
+
 </script>

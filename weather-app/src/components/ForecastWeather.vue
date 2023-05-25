@@ -1,7 +1,7 @@
 <template>
   <div class="forecast-weather">
     <div
-      v-for="(forecast, index) in forecastData.slice(0,10)"
+      v-for="(forecast, index) in forecastData.slice(1,10)"
       :key="index"
       class="forecast-item"
     >

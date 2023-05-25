@@ -21,6 +21,10 @@ import OldSearches from "./components/OldSearches.vue";
     const forecastData = ref<ForecastWeatherData | null>(null);
     const recentSearches = ref<string[]>([])
     const showWeatherDetails = ref(false);
+    const noLocationFound = ref("");
+    const  = ref(localStorage.getItem("firstSearch"));
+
+    
     
 const handleWeatherDetail = async () => {
   try {
@@ -38,6 +42,7 @@ const handleWeatherDetail = async () => {
   }
 }; 
 
+
 const toggleDetails = () => {
   showWeatherDetails.value = !showWeatherDetails.value;
   if (showWeatherDetails.value && !weatherDetails.value){
@@ -47,17 +52,12 @@ const toggleDetails = () => {
 
 const onCitySearched = async (cityName) => {
   console.log("City name received in App.vue:", cityName);
-  try {
+  try { 
+    noLocationFound.value="";
     const location = await fetchGeoLocation(cityName);
     if (!location) {
-      // Handle no location found
+      noLocationFound.value ="No location was found on the search, try again";
       return;
-    }
-
-    recentSearches.value.unshift(cityName);
-
-    if(recentSearches.value.length >3) {
-      recentSearches.value.pop();
     }
 
     const currentWeatherData = await fetchCurrentWeather(location.lat, location.lon);
@@ -66,40 +66,29 @@ const onCitySearched = async (cityName) => {
       main: currentWeatherData.main,
       weather: currentWeatherData.weather
     };
+    
+    //local storage  
+    localStorage.setItem("firstSearch", currentWeather.value?.name)
+    firstSearch1.value = currentWeather.value?.name;
 
-    const weatherDetailsData = await fetchWeatherDetails(location.lat, location.lon);
-    weatherDetails.value = {
-      name: weatherDetailsData.name,
-      main: weatherDetailsData.main,
-      wind: weatherDetailsData.wind,
-      weather: weatherDetailsData.weather,
-    };
+    
+
 
     const forecastWeatherData = await fetchForecastData(location.lat, location.lon);
     forecastData.value = forecastWeatherData;
-    console.log(forecastData.value);
   } catch (error) {
     console.error(error);
   }
 };
-
-const loadRecentSearches = () => {
-  const searches = localStorage.getItem("recentSearches");
-  if(searches){
-    recentSearches.value = JSON.parse(searches);
-  }
-};
-
-loadRecentSearches();
     
 </script>
 
 <template>
   <div id ="app">
     <nav-bar></nav-bar>
-    <OldSearches></OldSearches>
+    <button> {{ firstSearch1 }}</button>
     <search-bar @city-searched="onCitySearched"> </search-bar>
-    
+    <div v-if="noLocationFound" class="no-location-found">{{ noLocationFound }}</div>
     <div v-if="currentWeather!==null" class="current-weather">
       <img :src="'http://openweathermap.org/img/wn/' + currentWeather.weather[0].icon + '.png'" />
       <p>Stad: {{ currentWeather.name }}</p>
