@@ -24,7 +24,7 @@ import OldSearches from "./components/OldSearches.vue";
     const noLocationFound = ref("");
     const latestSearches = ref<string[]>([]);
     const maxLatesetSearches = 3;
-
+    const standardCities = ["Göteborg", "Stockholm", "Lund"]
     
     
 const handleWeatherDetail = async () => {
@@ -86,6 +86,10 @@ const onCitySearched = async (cityName) => {
 const firstSearch1 = computed(() => latestSearches.value[0]);
 const secondSearch = computed(() => latestSearches.value[1]);
 const thirdSearch = computed(() => latestSearches.value[2]);
+
+if (latestSearches.value.length === 0) {
+  latestSearches.value.push(...standardCities)
+}
     
 </script>
 
