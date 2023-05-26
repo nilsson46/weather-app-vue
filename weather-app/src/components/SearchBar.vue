@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="search-bar">
       <input
         class="city-input"
         placeholder="Search city..."
@@ -64,4 +64,21 @@ onMounted(() => {
   }
 })
 
+
 </script>
+
+<style>
+.search-bar{
+  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.city-input{
+  background-color: rgb(207, 249, 255);
+  padding: 0.5rem;
+  margin: 0.5rem;
+  border-radius: 0.5rem;
+  border: 0.1rem black solid;;
+}
+</style>

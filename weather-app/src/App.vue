@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, watch, onMounted, computed} from "vue";
-import { RouterLink, RouterView } from 'vue-router';
+import { ref, computed} from "vue";
+import {RouterView } from 'vue-router';
 import {
   fetchCurrentWeather,
   fetchWeatherDetails,
@@ -11,9 +11,10 @@ import {
 } from "./service/apiService";
 import type {
   CurrentWeatherData,
-  WeatherDetailsData
+
 } from "./service/apiService";
 import type {ForecastDataInterface} from "./modules/types"
+import type {WeatherDetailsData} from "./modules/types"
 import NavBar from "./components/NavBar.vue";
 import SearchBar from "./components/SearchBar.vue";
 import WeatherDetails from "./components/WeatherDetails.vue";
@@ -98,17 +99,19 @@ const updateInputValue = (value: string) => {
 <template>
   <div id ="app">
     <nav-bar></nav-bar>
-    <button @click="updateInputValue(firstSearch)"> {{ firstSearch }}</button>
-    <button @click="updateInputValue(secondSearch)"> {{ secondSearch }}</button>
-    <button @click="updateInputValue(thirdSearch)"> {{ thirdSearch }}</button>
+    <div class="button-section">
+    <button class="history-btn" @click="updateInputValue(firstSearch)"> {{ firstSearch }}</button>
+    <button class="history-btn" @click="updateInputValue(secondSearch)"> {{ secondSearch }}</button>
+    <button class="history-btn" @click="updateInputValue(thirdSearch)"> {{ thirdSearch }}</button>
+  </div>
     <search-bar :initialValue="inputValue" @city-searched="onCitySearched"> </search-bar>
     <div v-if="noLocationFound" class="no-location-found">{{ noLocationFound }}</div>
     <div v-if="currentWeather!==null" class="current-weather">
-      <img :src="'http://openweathermap.org/img/wn/' + currentWeather.weather[0].icon + '.png'" />
-      <p>Stad: {{ currentWeather.name }}</p>
-      <p>Tempratur: {{ currentWeather.main.temp}} °C</p>
-      <p>Väderförhållanden: {{ currentWeather.weather[0].description }}</p>
-      <button class="weather-details" @click="toggleDetails">Deatails</button>
+      <img class="current-weather-icon" :src="'http://openweathermap.org/img/wn/' + currentWeather.weather[0].icon + '.png'" />
+      <p class="current-weather-p">Stad: {{ currentWeather.name }}</p>
+      <p class="current-weather-p">Tempratur: {{ currentWeather.main.temp}} °C</p>
+      <p class="current-weather-p">Väderförhållanden: {{ currentWeather.weather[0].description }}</p>
+      <button class="weather-details-btn" @click="toggleDetails">Deatails</button>
 
     </div>  
 
@@ -117,6 +120,7 @@ const updateInputValue = (value: string) => {
     :wind-speed="weatherDetails.wind.speed"
     :feels_like="weatherDetails.main.feels_like"
     :pressure=" weatherDetails.main.pressure"
+    :humidity="weatherDetails.main.humidity"
     ></WeatherDetails>
     <div>
       <ForecastWeather v-if="forecastData !== null" :forecastData="forecastData">
@@ -128,5 +132,44 @@ const updateInputValue = (value: string) => {
 </template>
 
 <style scoped>
+ #app{
+  font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  background-color:#FFFFFF ;
+  border-radius: 0.5rem;
+  padding: 1rem;
+ }
 
+ .weather-details-btn{
+  background-color:rgb(207, 249, 255);;
+  border: 0.1rem black solid;
+  margin: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+ }
+ .current-weather-p{
+  background-color: rgb(207, 249, 255);
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+ }
+ .current-weather-icon{
+  height: 10rem;
+  width: 10rem;
+ }
+ .current-weather{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+ }
+ .button-section{
+  display: flex;
+  justify-content: center;
+ }
+ .history-btn{
+  background-color: rgb(207, 249, 255);
+  border: 0.1rem black solid;
+  margin: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+ }
 </style>

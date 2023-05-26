@@ -1,5 +1,6 @@
 import axios from "axios";
 import type { ForecastDataInterface } from "../modules/types"
+import type { WeatherDetailsData } from "../modules/types"
 
 interface GeoLocation {
   lat: number; 
@@ -17,21 +18,7 @@ export interface CurrentWeatherData {
   }[];
 }
 
-export interface WeatherDetailsData{
-  name: string; 
-  main: {
-    temp: number; 
-    feels_like: number;
-    pressure: number; 
-  };
-  wind: {
-    speed: number;
-  };
-  weather: {
-    main: string; 
-    description: string;
-  }[];
-} 
+ 
 
 
 export const fetchGeoLocation = async (city: string): Promise<GeoLocation> => {
@@ -71,7 +58,7 @@ export const fetchWeatherDetails = async (lat: number, lon: number): Promise<Wea
 export const fetchForecastData = async (lat: number, lon: number): Promise<ForecastDataInterface[]> => {
   try {
     const response = await axios.get<ForecastDataInterface[]>(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=eae526c0c59da830ba1afac8ab0f3347&units=metric`);
-    return response.data.list; // Modify here to access the list of forecast data
+    return response.data.list;
   } catch (error) {
     throw new Error("Failed to fetch forecast weather data");
   }

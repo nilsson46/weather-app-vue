@@ -1,6 +1,6 @@
 <template>
     <nav>
-        <h1>Tjena tjena</h1>
+        <h1>Awesome Weather App</h1>
     </nav>
 </template>
 
@@ -17,6 +17,14 @@ export default defineComponent({
 
 <style>
     nav{
-        background-color: aqua;
+        background-color: rgb(207, 249, 255);
+        border-radius: 1rem;
+        margin: 1rem;
+    }
+    h1{
+        display: flex;
+        justify-content:center;
+        align-items: center;
+        padding: 1rem;
     }
 </style>
